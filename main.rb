@@ -15,10 +15,10 @@ helpers do
   end
 
   def deal_cards
-    session[:player_cards] << session[:deck].pop
-    session[:dealer_cards] << session[:deck].pop
-    session[:player_cards] << session[:deck].pop
-    session[:dealer_cards] << session[:deck].pop
+    2.times do
+      session[:player_cards] << session[:deck].pop
+      session[:dealer_cards] << session[:deck].pop
+    end
   end
 
   def calculate_total(cards)
@@ -33,7 +33,7 @@ helpers do
   end
 
   def hide_dealer_card(cards)
-    if cards == session[:dealer_cards] && session[:show_dealer_card] == false
+    if cards == session[:dealer_cards] && !session[:show_dealer_card]
       cards = [cards[0]]
     end
     cards
@@ -161,13 +161,18 @@ post '/game/player/hit' do
   if calculate_total(session[:player_cards]) >= 21
     session[:stand] = true
     session[:dealer_turn] = false
+    if calculate_total(session[:player_cards]) == 21
+      session[:show_dealer_card] = true
+    end
+    redirect '/game/dealer'
   end
-  if calculate_total(session[:player_cards]) == 21
-    session[:show_dealer_card] = true
-  end
+  redirect '/game/player/hit'
+end
 
+get '/game/player/hit' do
   erb :game
 end
+  
 
 post '/game/player/stand' do
   session[:stand] = true
@@ -184,11 +189,14 @@ post '/game/dealer/hit' do
   session[:dealer_cards] << session[:deck].pop
   if calculate_total(session[:dealer_cards]) < 17
     session[:dealer_turn] = true
-    erb :game
   else
     session[:dealer_turn] = false
-    erb :game
   end
+  redirect '/game/dealer/hit'
+end
+
+get '/game/dealer/hit' do
+  erb :game
 end
 
 get '/quit' do
