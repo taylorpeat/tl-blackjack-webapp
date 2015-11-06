@@ -1,0 +1,9 @@
+img.card_image {
+  margin: 0px 5px 5px 0px;
+  border: 2px solid;
+}
+
+form.game_btn {
+  float:left;
+  margin-right: 10px;
+}

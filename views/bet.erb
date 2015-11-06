@@ -1,0 +1,7 @@
+<h1>Place your bet.</h1>
+<form action '/bet' method='post'>
+  <label>Enter your bet below:</label>
+  <input type="number" placeholder="This is below" name='bet'/>
+  <p><em>Your current balance is $<%= session[:balance] %>.</em></p>
+  <button type="submit" class="btn">Place bet</button>
+</form>
