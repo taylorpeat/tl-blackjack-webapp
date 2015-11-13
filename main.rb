@@ -6,7 +6,7 @@ use Rack::Session::Cookie, :key => 'rack.session',
                            :secret => '98h2jowbvu05jd3'
 
 helpers do
-  SUITS = %i(S C D H)
+  SUITS = [:S, :C, :D, :H]
   VALUES = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"]
 
   def create_deck
