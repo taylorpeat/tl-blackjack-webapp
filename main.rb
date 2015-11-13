@@ -1,7 +1,6 @@
 require 'rubygems'
 require 'sinatra'
 
-
 use Rack::Session::Cookie, :key => 'rack.session',
                            :path => '/',
                            :secret => '98h2jowbvu05jd3'
@@ -49,11 +48,12 @@ helpers do
   end
 
 
-  def card_image(card)
+  def card_image(card, idx, hand_size)
     suit = determine_suit(card[0])
     value = determine_card_value(card[1])
+    card_class = determine_card_class(idx, hand_size)
     
-    "<img src='/images/cards/#{suit}_#{value}.jpg' class='card_image'>"
+    "<img src='/images/cards/#{suit}_#{value}.jpg' class='#{card_class}'>"
   end
 
   def determine_suit(suit)
@@ -75,6 +75,14 @@ helpers do
       end
     end
     new_value ||= value
+  end
+
+  def determine_card_class(idx, hand_size)
+    if hand_size == idx + 1 || idx == 0
+      "end_card"
+    else
+      "middle_card"
+    end
   end
 
   def determine_results
@@ -150,6 +158,11 @@ get '/game' do
       session[:bet] = session[:balance]
     end
     deal_cards
+    if calculate_total(session[:player_cards]) == 21
+      session[:stand] = true
+      session[:show_dealer_card] = true
+      session[:dealer_turn] = true
+    end
     erb :game
   else
     redirect '/username'
@@ -157,33 +170,36 @@ get '/game' do
 end
 
 post '/game/player/hit' do
+  @slide = true
+  erb :game
+  @slide = false
   session[:player_cards] << session[:deck].pop
   if calculate_total(session[:player_cards]) >= 21
     session[:stand] = true
     session[:dealer_turn] = false
     if calculate_total(session[:player_cards]) == 21
       session[:show_dealer_card] = true
+      session[:dealer_turn] = true
     end
-    redirect '/game/dealer'
   end
-  redirect '/game/player/hit'
+  redirect '/game/update'
 end
 
-get '/game/player/hit' do
-  erb :game
+get '/game/update' do
+  erb :game, :layout => false
 end
   
 
 post '/game/player/stand' do
   session[:stand] = true
-  redirect '/game/dealer'
-end
-
-get '/game/dealer' do
   session[:dealer_turn] = true
   session[:show_dealer_card] = true
-  erb :game
+  redirect '/game/update'
 end
+
+# get '/game/dealer' do
+#   erb :game, :layout => false
+# end
 
 post '/game/dealer/hit' do
   session[:dealer_cards] << session[:deck].pop
@@ -192,12 +208,12 @@ post '/game/dealer/hit' do
   else
     session[:dealer_turn] = false
   end
-  redirect '/game/dealer/hit'
+  redirect '/game/update'
 end
 
-get '/game/dealer/hit' do
-  erb :game
-end
+# get '/game/dealer/hit' do
+#   erb :game, :layout => false
+# end
 
 get '/quit' do
   @balance = session[:balance]

@@ -1,9 +1,25 @@
-img.card_image {
+img.end_card {
   margin: 0px 5px 5px 0px;
   border: 2px solid;
 }
 
-form.game_btn {
+form#hit_form {
   float:left;
   margin-right: 10px;
+}
+
+form#stand_form {
+  float:left;
+  margin-right: 10px;
+}
+
+form.standard_btn {
+  float:left;
+  margin-right: 10px;
+}
+
+img.middle_card {
+  margin: 0px 5px 5px 0px;
+  border: 2px solid;
+  margin-left: -140px;
 }
